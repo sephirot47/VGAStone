@@ -14,7 +14,7 @@ Platform assembly: Z:\GAMES\VGAStone\VGAStone_Data\Managed\Assembly-UnityScript-
 Loading Z:\GAMES\VGAStone\VGAStone_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
 Platform assembly: Z:\GAMES\VGAStone\VGAStone_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading Z:\GAMES\VGAStone\VGAStone_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  1.366 seconds
+- Completed reload, in  1.045 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.

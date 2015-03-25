@@ -4,6 +4,7 @@ using System.Collections;
 public class Card : MonoBehaviour 
 {
 	private const float elevation = 2.5f, rotSpeed = 3.0f, rotFadeSpeed = 4.0f, timeSinceDrop = 0.0f;
+	private int attack, life;
 	private bool beingHeld;
 	
 	void Start () 
@@ -11,6 +12,17 @@ public class Card : MonoBehaviour
 		transform.position = new Vector3(0, elevation, 0);
 		beingHeld = false;
 		MapUVs();
+
+		attack = life = 3;
+
+		Transform[] ts = transform.GetComponentsInChildren<Transform>();
+		foreach (Transform t in ts) 
+		{
+			if (t.gameObject.name == "LifeText") 
+				t.gameObject.GetComponent<TextMesh>().text = life.ToString();
+			else if(t.gameObject.name == "AttackText") 
+				t.gameObject.GetComponent<TextMesh>().text = attack.ToString();
+		}
 	}
 	
 	bool HasBeenClicked()
@@ -62,7 +74,7 @@ public class Card : MonoBehaviour
 		{
 			Vector3 colCoords = GetCollisionCoordinates();
 			rigidbody.MovePosition(new Vector3(colCoords.x, elevation, colCoords.z));
-			rigidbody.AddTorque(new Vector3(0.0f, 0.0f, 1.0f));
+			rigidbody.AddTorque(new Vector3(100.0f, 100.0f, 100.0f));
 			rigidbody.useGravity = false;
 		}
 		else
