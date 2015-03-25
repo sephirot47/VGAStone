@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Card : MonoBehaviour 
 {
-	private const float elevation = 1.0f, rotSpeed = 3.0f, rotFadeSpeed = 4.0f;
+	private const float elevation = 2.5f, rotSpeed = 3.0f, rotFadeSpeed = 4.0f, timeSinceDrop = 0.0f;
 	private bool beingHeld;
 
 	void Start () 
@@ -22,7 +22,6 @@ public class Card : MonoBehaviour
 		{
 			if(hit.collider.gameObject.GetInstanceID() == gameObject.GetInstanceID())
 			{
-				Debug.Log ("asd");
 				return true;
 			}
 		}
@@ -53,6 +52,10 @@ public class Card : MonoBehaviour
 		else if(Input.GetMouseButtonUp(0))
 		{
 			beingHeld = false;
+
+			Vector3 displacement = GetCollisionCoordinates() - transform.position;
+			Debug.Log(displacement.x);
+			rigidbody.AddForce( new Vector3(displacement.x, 0, displacement.z) * 300.0f );
 		}
 
 		if(beingHeld)
@@ -60,16 +63,20 @@ public class Card : MonoBehaviour
 			Vector3 colCoords = GetCollisionCoordinates();
 			Vector3 displacement = colCoords - transform.position;
 
-			transform.position = new Vector3(colCoords.x, elevation, colCoords.z);
-			transform.rotation = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotSpeed, new Vector3(0.0f, 0.0f, 1.0f)) * transform.rotation;
-			transform.rotation = Quaternion.AngleAxis(-Input.GetAxis("Mouse Y") * rotSpeed, new Vector3(1.0f, 0.0f, 0.0f)) * transform.rotation;
+			rigidbody.MovePosition(new Vector3(colCoords.x, elevation, colCoords.z));
+			rigidbody.useGravity = false;
+			//rigidbody.rotation = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * rotSpeed, new Vector3(0.0f, 0.0f, 1.0f)) * transform.rotation;
+			//rigidbody.rotation = Quaternion.AngleAxis(-Input.GetAxis("Mouse Y") * rotSpeed, new Vector3(1.0f, 0.0f, 0.0f)) * transform.rotation;
 
-			Debug.Log(displacement.magnitude);
-			transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, 0, 0), Time.deltaTime * rotFadeSpeed);  
+			//rigidbody.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, 0, 0), Time.deltaTime * rotFadeSpeed);  
 		}
 		else
 		{
-			//transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, 0), transform.rotation, Time.deltaTime);  
+			Vector3 colCoords = GetCollisionCoordinates();
+			Vector3 displacement = colCoords - transform.position;
+
+			//rigidbody.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, 0), transform.rotation, Time.deltaTime); 
+			rigidbody.useGravity = true;
 		}
 	}
 }
