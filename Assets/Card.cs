@@ -1,24 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Card : MonoBehaviour 
 {
 	private const float elevation = 2.5f, rotSpeed = 2.0f, rotFadeSpeed = 4.0f, timeSinceDrop = 0.0f;
 	private int attack, life;
 	private bool beingHeld, onBoard;
+
+	public static List<Card> cards = new List<Card>();
 	
 	void Start () 
 	{
 		MapUVs();
-
 		Physics.IgnoreLayerCollision (LayerMask.NameToLayer ("Card Layer"), LayerMask.NameToLayer ("Card Layer"));
 		transform.position = new Vector3(2.5f, elevation, 2.8f);
 		beingHeld = onBoard = false;
+
+		cards.Add(this);
 
 		attack = 1;
 		life = 3;
 
 		UpdateInfo();
+	}
+	
+	bool IsAttacking()
+	{
+		return beingHeld && onBoard;
 	}
 
 	void UpdateInfo()
@@ -70,10 +79,7 @@ public class Card : MonoBehaviour
 	{
 		if(!onBoard)
 		{
-			if(Input.GetMouseButtonDown(0))
-			{
-				beingHeld = HasBeenClicked();
-			}
+			if(Input.GetMouseButtonDown(0)) beingHeld = HasBeenClicked();
 			else if(Input.GetMouseButtonUp(0))
 			{
 				if(beingHeld)
@@ -81,7 +87,6 @@ public class Card : MonoBehaviour
 					Vector3 displacement = GetCollisionCoordinates() - transform.position;
 					rigidbody.AddForce( new Vector3(displacement.x, 0, displacement.z) * 300.0f );
 				}
-				
 				beingHeld = false;
 			}
 			
@@ -89,18 +94,28 @@ public class Card : MonoBehaviour
 			{
 				Vector3 colCoords = GetCollisionCoordinates();
 				rigidbody.MovePosition(new Vector3(colCoords.x, elevation, colCoords.z));
-
 				if(Input.GetMouseButton(1)) rigidbody.MoveRotation(rigidbody.rotation * Quaternion.AngleAxis(rotSpeed, new Vector3(0.0f, 1.0f, 0.0f)) );
-
 				rigidbody.useGravity = false;
 			}
-			else
-			{
-				rigidbody.useGravity = true;
-			}
+			else rigidbody.useGravity = true;
 		}
 		else
 		{
+			if(Input.GetMouseButtonDown(0)) beingHeld = HasBeenClicked();
+			else if(Input.GetMouseButtonUp(0))
+			{
+				if(beingHeld)
+				{
+					foreach(Card c in cards)
+					{
+						if(c.IsAttacking())
+						{
+							this.ReceiveAttack(c.GetAttack());
+							break;
+						}
+					}
+				}
+			}
 
 		}
 
@@ -109,8 +124,6 @@ public class Card : MonoBehaviour
 
 	void OnTriggerEnter(Collider col) 
 	{
-		Debug.Log("a");
-
 		if(col.gameObject.name == "PlayingZone")
 		{
 			onBoard = true;
@@ -129,5 +142,10 @@ public class Card : MonoBehaviour
 		for(int i = 0; i < 24; ++i)
 			if(i < 4 || i > 9) uvs[i]  = new Vector2(0.0f, 0.0f);
 		mesh.uv = uvs;
+	}
+
+	int GetAttack()
+	{
+		return attack;
 	}
 }
