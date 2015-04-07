@@ -3,18 +3,26 @@ using System.Collections;
 
 public class Card : MonoBehaviour 
 {
-	private const float elevation = 2.5f, rotSpeed = 3.0f, rotFadeSpeed = 4.0f, timeSinceDrop = 0.0f;
+	private const float elevation = 2.5f, rotSpeed = 2.0f, rotFadeSpeed = 4.0f, timeSinceDrop = 0.0f;
 	private int attack, life;
-	private bool beingHeld;
+	private bool beingHeld, onBoard;
 	
 	void Start () 
 	{
-		transform.position = new Vector3(0, elevation, 0);
-		beingHeld = false;
 		MapUVs();
 
-		attack = life = 3;
+		Physics.IgnoreLayerCollision (LayerMask.NameToLayer ("Card Layer"), LayerMask.NameToLayer ("Card Layer"));
+		transform.position = new Vector3(2.5f, elevation, 2.8f);
+		beingHeld = onBoard = false;
 
+		attack = 1;
+		life = 3;
+
+		UpdateInfo();
+	}
+
+	void UpdateInfo()
+	{
 		Transform[] ts = transform.GetComponentsInChildren<Transform>();
 		foreach (Transform t in ts) 
 		{
@@ -24,7 +32,7 @@ public class Card : MonoBehaviour
 				t.gameObject.GetComponent<TextMesh>().text = attack.ToString();
 		}
 	}
-	
+
 	bool HasBeenClicked()
 	{
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -39,7 +47,12 @@ public class Card : MonoBehaviour
 		}
 		return false;
 	}
-	
+
+	void ReceiveAttack(int attack)
+	{
+		life -= attack;
+	}
+
 	Vector3 GetCollisionCoordinates()
 	{
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -55,84 +68,66 @@ public class Card : MonoBehaviour
 	
 	void Update () 
 	{
-		if(Input.GetMouseButtonDown(0))
+		if(!onBoard)
 		{
-			beingHeld = HasBeenClicked();
-		}
-		else if(Input.GetMouseButtonUp(0))
-		{
-			if(beingHeld)
+			if(Input.GetMouseButtonDown(0))
 			{
-				Vector3 displacement = GetCollisionCoordinates() - transform.position;
-				rigidbody.AddForce( new Vector3(displacement.x, 0, displacement.z) * 300.0f );
+				beingHeld = HasBeenClicked();
+			}
+			else if(Input.GetMouseButtonUp(0))
+			{
+				if(beingHeld)
+				{
+					Vector3 displacement = GetCollisionCoordinates() - transform.position;
+					rigidbody.AddForce( new Vector3(displacement.x, 0, displacement.z) * 300.0f );
+				}
+				
+				beingHeld = false;
 			}
 			
-			beingHeld = false;
-		}
-		
-		if(beingHeld)
-		{
-			Vector3 colCoords = GetCollisionCoordinates();
-			rigidbody.MovePosition(new Vector3(colCoords.x, elevation, colCoords.z));
-			rigidbody.AddTorque(new Vector3(100.0f, 100.0f, 100.0f));
-			rigidbody.useGravity = false;
+			if(beingHeld)
+			{
+				Vector3 colCoords = GetCollisionCoordinates();
+				rigidbody.MovePosition(new Vector3(colCoords.x, elevation, colCoords.z));
+
+				if(Input.GetMouseButton(1)) rigidbody.MoveRotation(rigidbody.rotation * Quaternion.AngleAxis(rotSpeed, new Vector3(0.0f, 1.0f, 0.0f)) );
+
+				rigidbody.useGravity = false;
+			}
+			else
+			{
+				rigidbody.useGravity = true;
+			}
 		}
 		else
 		{
-			rigidbody.useGravity = true;
+
+		}
+
+		UpdateInfo();
+	}
+
+	void OnTriggerEnter(Collider col) 
+	{
+		Debug.Log("a");
+
+		if(col.gameObject.name == "PlayingZone")
+		{
+			onBoard = true;
 		}
 	}
-	
+
 	void MapUVs()
 	{
+		//Para que solo se vea el top de la carta
+
 		MeshFilter mf = GetComponent<MeshFilter>();
 		Mesh mesh = null;
-		if (mf != null)
-			mesh = mf.mesh;
-		
-		if (mesh == null || mesh.uv.Length != 24) {
-			Debug.Log("Script needs to be attached to built-in cube");
-			return;
-		}
+		if (mf != null) mesh = mf.mesh;
 		
 		Vector2[] uvs = mesh.uv;
-		
-		// Front
-		uvs[0]  = new Vector2(0.0f, 0.0f);
-		uvs[1]  = new Vector2(0.0f, 0.0f);
-		uvs[2]  = new Vector2(0.0f, 0.0f);
-		uvs[3]  = new Vector2(0.0f, 0.0f);
-		
-		// Top
-		uvs[8]  = new Vector2(0.334f, 0.0f);
-		uvs[9]  = new Vector2(0.666f, 0.0f);
-		uvs[4]  = new Vector2(0.334f, 0.333f);
-		uvs[5]  = new Vector2(0.666f, 0.333f);
-		
-		// Back
-		uvs[10]  = new Vector2(0.0f, 0.0f);
-		uvs[11]  = new Vector2(0.0f, 0.0f);
-		uvs[6]  = new Vector2(0.0f, 0.0f);
-		uvs[7]  = new Vector2(0.0f, 0.0f);
-		
-		// Bottom
-		uvs[12] = new Vector2(0.0f, 0.334f);
-		uvs[14] = new Vector2(0.333f, 0.334f);
-		uvs[15] = new Vector2(0.0f, 0.666f);
-		uvs[13] = new Vector2(0.333f, 0.666f);                
-		
-		// Left
-		uvs[16]  = new Vector2(0.0f, 0.0f);
-		uvs[18]  = new Vector2(0.0f, 0.0f);
-		uvs[19]  = new Vector2(0.0f, 0.0f);
-		uvs[17]  = new Vector2(0.0f, 0.0f);    
-		
-		// Right        
-		uvs[20]  = new Vector2(0.0f, 0.0f);
-		uvs[22]  = new Vector2(0.0f, 0.0f);
-		uvs[23]  = new Vector2(0.0f, 0.0f);
-		uvs[21]  = new Vector2(0.0f, 0.0f);    
-		
+		for(int i = 0; i < 24; ++i)
+			if(i < 4 || i > 9) uvs[i]  = new Vector2(0.0f, 0.0f);
 		mesh.uv = uvs;
 	}
 }

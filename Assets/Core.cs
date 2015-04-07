@@ -14,7 +14,7 @@ public class Core : MonoBehaviour
 		GameObject.Find("OpponentsNameText").GetComponent<TextMesh>().text = "Opponent";
 		GameObject.Find("YourNameText").GetComponent<TextMesh>().text = "You";
 		
-		GameObject.Find("OpponentsLifeText").GetComponent<TextMesh>().text = "100";
+		GameObject.Find("OpponentsLifeText").GetComponent<TextMesh>().text = initialLife.ToString();
 		GameObject.Find("YourLifeText").GetComponent<TextMesh>().text = initialLife.ToString();
 		
 		GameObject.Find("OpponentsManaText").GetComponent<TextMesh>().text = "1/1";
