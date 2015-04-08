@@ -140,11 +140,12 @@ public class Card : MonoBehaviour
 				if(arrow != null)
 				{
 					Vector3 mouseCoords = GetCollisionCoordinates();
-					arrow.transform.rotation = Quaternion.LookRotation( new Vector3(mouseCoords.x, 0.0f, mouseCoords.z), new Vector3(0,1,0) );
-					arrow.transform.rotation *= Quaternion.AngleAxis( 90.0f, new Vector3(1, 0, 0) );
-					
 					Vector3 arrowAux = new Vector3(arrow.transform.position.x, 0.0f, arrow.transform.position.z);
 					Vector3 mouseAux = new Vector3(mouseCoords.x, 0.0f, mouseCoords.z);
+
+					arrow.transform.rotation = Quaternion.LookRotation( new Vector3(mouseCoords.x, 0.0f, mouseCoords.z) - arrowAux, 
+					                                                    new Vector3(0,1,0) );
+					arrow.transform.rotation *= Quaternion.AngleAxis( 90.0f, new Vector3(1, 0, 0) );
 
 					Debug.DrawLine(mouseAux, mouseAux * 1.01f, Color.green, 9999.0f, false);
 
