@@ -81,7 +81,7 @@ public class Card : MonoBehaviour
 		return Vector3.zero;
 	}
 	
-	void Update () 
+	void Update()
 	{
 		if(!onBoard)
 		{
@@ -113,6 +113,7 @@ public class Card : MonoBehaviour
 		}
 		else //ON BOARD
 		{
+			float arrowElevation = 5.0f;
 			if(Input.GetMouseButtonDown(0))
 			{
 				beingHeld = HasBeenClicked();
@@ -120,7 +121,7 @@ public class Card : MonoBehaviour
 				{
 					GameObject arrow = (GameObject) Instantiate(Resources.Load("Arrow"));
 					arrow.name = "Arrow";
-					arrow.transform.position = transform.position;
+					arrow.transform.position = new Vector3(transform.position.x, arrowElevation, transform.position.z);
 				}
 			}
 			else if(Input.GetMouseButtonUp(0) && !beingHeld)
@@ -146,15 +147,15 @@ public class Card : MonoBehaviour
 				if(arrow != null)
 				{
 					Vector3 mouseCoords = GetCollisionCoordinates();
-					Vector3 arrowAux = new Vector3(arrow.transform.position.x, 0.0f, arrow.transform.position.z);
-					Vector3 mouseAux = new Vector3(mouseCoords.x, 0.0f, mouseCoords.z);
+					Vector3 arrowAux = new Vector3(arrow.transform.position.x, arrowElevation, arrow.transform.position.z);
+					Vector3 mouseAux = new Vector3(mouseCoords.x, arrowElevation, mouseCoords.z);
 
-					arrow.transform.rotation = Quaternion.LookRotation( new Vector3(mouseCoords.x, 0.0f, mouseCoords.z) - arrowAux, 
+					arrow.transform.rotation = Quaternion.LookRotation( new Vector3(mouseCoords.x, arrowElevation, mouseCoords.z) - arrowAux, 
 					                                                    new Vector3(0,1,0) );
 					arrow.transform.rotation *= Quaternion.AngleAxis( 90.0f, new Vector3(1, 0, 0) );
 
 					GameObject tip = GameObject.Find("Tip");
-					Vector3 arrowTipPos = new Vector3(tip.transform.position.x, 0.0f, tip.transform.position.z);
+					Vector3 arrowTipPos = new Vector3(tip.transform.position.x, arrowElevation, tip.transform.position.z);
 					int iter = 0;
 					while((arrowTipPos - mouseAux).magnitude > 0.05f && ++iter < 1000)
 					{
@@ -162,7 +163,7 @@ public class Card : MonoBehaviour
 						arrow.transform.localScale = new Vector3(arrow.transform.localScale.x, 
 						                                         arrow.transform.localScale.y * (1.0f + mult * ((arrowTipPos - arrowAux).magnitude < (mouseAux - arrowAux).magnitude ? 1.0f : -1.0f)),
 						                                         arrow.transform.localScale.z);
-						arrowTipPos = new Vector3(tip.transform.position.x, 0.0f, tip.transform.position.z);
+						arrowTipPos = new Vector3(tip.transform.position.x, arrowElevation, tip.transform.position.z);
 					}
 
 					//Para que se vea solo cuando esta bien colocado, si no hace flicker al crear la arrow a veces

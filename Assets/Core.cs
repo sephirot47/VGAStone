@@ -4,6 +4,7 @@ using System.Collections;
 public class Core : MonoBehaviour 
 {
 	private static int initialLife = 100;
+	public static bool attacking = false;
 
 	void Start () 
 	{
