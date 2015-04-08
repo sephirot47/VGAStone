@@ -61,9 +61,15 @@ public class Card : MonoBehaviour
 		return false;
 	}
 
-	void ReceiveAttack(int attack)
+	bool ReceiveAttack(int attack)
 	{
 		life -= attack;
+		if (life <= 0)
+		{
+			Die();
+		}
+
+		return life <= 0;
 	}
 
 	Vector3 GetCollisionCoordinates()
@@ -113,8 +119,8 @@ public class Card : MonoBehaviour
 				if(beingHeld)
 				{
 					GameObject arrow = (GameObject) Instantiate(Resources.Load("Arrow"));
-					arrow.transform.position = transform.position;
 					arrow.name = "Arrow";
+					arrow.transform.position = transform.position;
 				}
 			}
 			else if(Input.GetMouseButtonUp(0) && !beingHeld)
@@ -123,7 +129,7 @@ public class Card : MonoBehaviour
 				{
 					if(c.IsAttacking())
 					{
-						this.ReceiveAttack(c.GetAttack());
+						if(HasBeenClicked()) this.ReceiveAttack(c.GetAttack());
 						break;
 					}
 				}
@@ -147,23 +153,21 @@ public class Card : MonoBehaviour
 					                                                    new Vector3(0,1,0) );
 					arrow.transform.rotation *= Quaternion.AngleAxis( 90.0f, new Vector3(1, 0, 0) );
 
-					Debug.DrawLine(mouseAux, mouseAux * 1.01f, Color.green, 9999.0f, false);
-
 					GameObject tip = GameObject.Find("Tip");
 					Vector3 arrowTipPos = new Vector3(tip.transform.position.x, 0.0f, tip.transform.position.z);
 					int iter = 0;
-					Debug.DrawLine(arrowTipPos, arrowTipPos * 1.01f, Color.red, 9999.0f, false);
-					/*
-					while((arrowTipPos - mouseAux).magnitude > 0.2f && ++iter < 50)
+					while((arrowTipPos - mouseAux).magnitude > 0.05f && ++iter < 1000)
 					{
+						float mult = 0.01f;
 						arrow.transform.localScale = new Vector3(arrow.transform.localScale.x, 
-						                                         arrow.transform.localScale.y * 0.9f,
+						                                         arrow.transform.localScale.y * (1.0f + mult * ((arrowTipPos - arrowAux).magnitude < (mouseAux - arrowAux).magnitude ? 1.0f : -1.0f)),
 						                                         arrow.transform.localScale.z);
 						arrowTipPos = new Vector3(tip.transform.position.x, 0.0f, tip.transform.position.z);
+					}
 
-						Debug.Log ((arrowTipPos - mouseAux).magnitude);
-						Debug.DrawLine(arrowTipPos, arrowTipPos * 1.01f, Color.red, 9999.0f, false);
-					}*/
+					//Para que se vea solo cuando esta bien colocado, si no hace flicker al crear la arrow a veces
+					//esta desactivada de inicio desde unity
+					GameObject.Find("ArrowMesh").GetComponent<MeshRenderer>().enabled = true; 
 				}
 			}
 		}
@@ -175,6 +179,11 @@ public class Card : MonoBehaviour
 		}
 
 		UpdateInfo();
+	}
+
+	void Die()
+	{
+		Destroy(gameObject);
 	}
 
 	void OnTriggerEnter(Collider col) 
