@@ -36,7 +36,6 @@ public class NetworkManager : MonoBehaviour
 			if (GUI.Button(new Rect(100, 100, 250, 100), "Start Server")) StartServer();
 			if (GUI.Button(new Rect(100, 250, 250, 100), "Refresh Hosts")) RefreshHostList();
 			
-			Debug.Log(hostList.Count);
 			for (int i = 0; i < hostList.Count; i++)
 			{
 				if (GUI.Button(new Rect(400, 100 + (110 * i), 300, 100), hostList[i].gameName)) JoinServer(hostList[i]);
@@ -51,12 +50,8 @@ public class NetworkManager : MonoBehaviour
 	
 	void OnMasterServerEvent(MasterServerEvent msEvent)
 	{
-		Debug.Log("*************");
 		if (msEvent == MasterServerEvent.HostListReceived)
-		{
-			Debug.Log("asdasdasdsdads   " + MasterServer.PollHostList().Length);
 			hostList.AddRange(MasterServer.PollHostList());
-		}
 	}
 
 	private void JoinServer(HostData hostData)
@@ -66,6 +61,6 @@ public class NetworkManager : MonoBehaviour
 	
 	void OnConnectedToServer()
 	{
-		Debug.Log("Server Joined");
+		Debug.Log("Joined to server");
 	}
 }

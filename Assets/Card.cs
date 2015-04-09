@@ -27,6 +27,8 @@ public class Card : MonoBehaviour
 		originalScale = transform.localScale;
 
 		UpdateInfo();
+
+		GetComponent<NetworkView>().observed = this;
 	}
 	
 	bool IsAttacking()
@@ -209,6 +211,20 @@ public class Card : MonoBehaviour
 		mesh.uv = uvs;
 	}
 
+	void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+	{
+		int numberOfCards = Card.cards.Count;
+		if (stream.isWriting)
+		{
+			stream.Serialize(ref numberOfCards);
+		}
+		else
+		{
+			stream.Serialize(ref numberOfCards);
+			Debug.Log("Number of cards on the other host: " + numberOfCards);
+		}
+	}
+	
 	int GetAttack()
 	{
 		return attack;
