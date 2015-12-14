@@ -1,2 +1,3 @@
 # VGAStone
-A hearthstone of VGAFIB, made with Unity (my association)
+A hearthstone of VGAFIB, made with Unity (my association) 
+WIP
